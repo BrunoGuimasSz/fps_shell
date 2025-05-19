@@ -1,14 +1,15 @@
-use std::io::{self, stdin, stdout, Write};
-use std::env::{current_dir, var,};
 use std::fs::OpenOptions;
+use std::io::{self, Write};
+
+pub mod command;
 
 fn main() -> io::Result<()> {
     loop {
-        print_user_and_directory();
+        command::print_user_and_directory();
 
-        let mut input: String = String::new();
+        let mut input = String::new();
 
-        stdin()
+        io::stdin()
             .read_line(&mut input)
             .expect("Error while reading line");
 
@@ -25,46 +26,6 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn get_user_name() -> String {
-    let username = if cfg!(target_os = "windows") {
-        var("USERNAME")
-    } else {
-        var("USER")
-    };
-
-    match username {
-        Ok(name) => {
-            return name;
-        }
-        Err(error) => {
-            eprintln!("Error: {error}");
-        }
-    };
-
-    String::from("Unknow user")
-}
-
-fn get_current_directory() -> String {
-    let current_path = current_dir();
-
-    match current_path {
-        Ok(path) => {
-            return path.display().to_string();
-        }
-        Err(error) => eprintln!("Error: {error}"), 
-    };
-
-    String::from("Unknow directory")
-}
-
-fn print_user_and_directory() {
-    let user: String = get_user_name();
-    let directory: String = get_current_directory();
-
-    print!("[{user}@{directory}] -> ");
-    stdout().flush().unwrap();
-}
-
 fn command_handler(input: String) {
     let token_array: Vec<String> = input
         .split_whitespace()
@@ -72,28 +33,13 @@ fn command_handler(input: String) {
         .collect();
 
     match token_array[0].as_str() {
-        "echo" => echo_command(token_array),
-        "cls" => clear_command(),
+        "echo" => command::echo(token_array),
+        "cls" => command::clear(),
+        "cat" => command::cat(token_array),
         _ => {
-            println!("Error: command not found: {}", token_array[0]);
+            println!("EWrror: command not found: {}", token_array[0]);
         }
     }
-}
-
-fn echo_command(token_array: Vec<String>) {
-    for i in token_array {
-        if i == "echo" {
-            continue;
-        }
-        print!("{i} ");
-        stdout().flush().unwrap();
-    }
-    println!()
-}
-
-fn clear_command()
-{
-    print!("\x1B[2J\x1B[1;1H");
 }
 
 fn save_command_in_history(input: String) {
