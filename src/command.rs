@@ -60,10 +60,11 @@ pub fn clear()
 pub fn cat(token_array: Vec<String>) {
     let file_path = &token_array[1];
 
-    let file = match fs::read_to_string(file_path) {
-        Ok(file_content) => print!("{}", file_content),
-        Err(error) => print!("File {} don't exist", file_path)
+    match fs::read_to_string(file_path) {
+        Ok(file_content) => {
+            print!("{}", file_content);
+            io::stdout().flush().unwrap();
+        },
+        Err(error) => eprintln!("Error: File {} don't exist: {}", file_path, error)
     };
-
-    io::stdout().flush();
 }
