@@ -1,5 +1,6 @@
 use std::io::{self, Write};
 use std::{env, fs};
+use std::path::Path;
 
 fn get_user_name() -> String {
     let username = if cfg!(target_os = "windows") {
@@ -58,6 +59,10 @@ pub fn clear()
 }
 
 pub fn cat(token_array: Vec<String>) {
+    if token_array.len() < 2 {
+        println!("Error: Type the file path");
+        return;
+    }
     let file_path = &token_array[1];
 
     match fs::read_to_string(file_path) {
@@ -67,4 +72,21 @@ pub fn cat(token_array: Vec<String>) {
         },
         Err(error) => eprintln!("Error: File {} don't exist: {}", file_path, error)
     };
+}
+
+pub fn cd(token_array: Vec<String>) {
+    let path = Path::new(&token_array[1]);
+
+    match env::set_current_dir(path) {
+        Ok(_path) => return,
+        Err(error) => eprintln!("Error: Directory not found: {}", error),
+    }
+}
+
+pub fn ls() {
+    let paths = fs::read_dir(".").unwrap();
+
+    for path in paths {
+        println!("{}", path.unwrap().path().display());
+    }
 }

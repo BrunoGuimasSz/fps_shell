@@ -36,8 +36,10 @@ fn command_handler(input: String) {
         "echo" => command::echo(token_array),
         "cls" => command::clear(),
         "cat" => command::cat(token_array),
+        "cd" => command::cd(token_array),
+        "ls" => command::ls(),
         _ => {
-            println!("EWrror: command not found: {}", token_array[0]);
+            println!("Error: command not found: {}", token_array[0]);
         }
     }
 }
