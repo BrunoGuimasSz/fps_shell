@@ -1,6 +1,7 @@
 use std::io::{self, Write};
 use std::{env, fs};
 use std::path::Path;
+use std::fs::File;
 
 fn get_user_name() -> String {
     let username = if cfg!(target_os = "windows") {
@@ -78,15 +79,27 @@ pub fn cd(token_array: Vec<String>) {
     let path = Path::new(&token_array[1]);
 
     match env::set_current_dir(path) {
-        Ok(_path) => return,
+        Ok(_path) => (),
         Err(error) => eprintln!("Error: Directory not found: {}", error),
     }
 }
 
-pub fn ls() {
-    let paths = fs::read_dir(".").unwrap();
+pub fn ls(token_array: Vec<String>) {
+    let dir = if token_array.len() > 1 {
+        &token_array[1]
+    } else {
+        "."
+    };
 
-    for path in paths {
-        println!("{}", path.unwrap().path().display());
+    let path = fs::read_dir(dir).unwrap();
+
+    for entry in path {
+        let entry = entry.unwrap();
+        let file_name = entry.file_name();
+        println!("{}", file_name.to_string_lossy());
     }
+}
+
+pub fn touch(token_array: Vec<String>) {
+    let _file = File::create(&token_array[1]).unwrap();
 }

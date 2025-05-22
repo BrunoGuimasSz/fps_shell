@@ -37,7 +37,8 @@ fn command_handler(input: String) {
         "cls" => command::clear(),
         "cat" => command::cat(token_array),
         "cd" => command::cd(token_array),
-        "ls" => command::ls(),
+        "ls" => command::ls(token_array),
+        "touch" => command::touch(token_array),
         _ => {
             println!("Error: command not found: {}", token_array[0]);
         }
