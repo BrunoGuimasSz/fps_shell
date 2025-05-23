@@ -43,8 +43,8 @@ pub fn print_user_and_directory() {
     io::stdout().flush().unwrap();
 }
 
-pub fn echo(token_array: Vec<String>) {
-    for i in token_array {
+pub fn echo(token_vec: Vec<String>) {
+    for i in token_vec {
         if i == "echo" {
             continue;
         }
@@ -59,12 +59,12 @@ pub fn clear()
     print!("\x1B[2J\x1B[1;1H");
 }
 
-pub fn cat(token_array: Vec<String>) {
-    if token_array.len() < 2 {
+pub fn cat(token_vec: Vec<String>) {
+    if token_vec.len() < 2 {
         println!("Error: Type the file path");
         return;
     }
-    let file_path = &token_array[1];
+    let file_path = &token_vec[1];
 
     match fs::read_to_string(file_path) {
         Ok(file_content) => {
@@ -75,8 +75,8 @@ pub fn cat(token_array: Vec<String>) {
     };
 }
 
-pub fn cd(token_array: Vec<String>) {
-    let path = Path::new(&token_array[1]);
+pub fn cd(token_vec: Vec<String>) {
+    let path = Path::new(&token_vec[1]);
 
     match env::set_current_dir(path) {
         Ok(_path) => (),
@@ -84,14 +84,14 @@ pub fn cd(token_array: Vec<String>) {
     }
 }
 
-pub fn ls(token_array: Vec<String>) {
-    let dir = if token_array.len() > 1 {
-        &token_array[1]
+pub fn ls(token_vec: Vec<String>, arg: &Option<&str>) {
+    let dir = if token_vec.len() > 1 {
+        &token_vec[1]
     } else {
         "."
     };
 
-    let path = fs::read_dir(dir).unwrap();
+    let path = fs::read_dir(dir).expect("Error: Directory not found");
 
     for entry in path {
         let entry = entry.unwrap();
@@ -100,6 +100,14 @@ pub fn ls(token_array: Vec<String>) {
     }
 }
 
-pub fn touch(token_array: Vec<String>) {
-    let _file = File::create(&token_array[1]).unwrap();
+pub fn touch(token_vec: Vec<String>) {
+    let _file = File::create(&token_vec[1]).unwrap();
+}
+
+pub fn rm(token_vec: Vec<String>) {
+    if token_vec.len() < 2 {
+        eprintln!("Type the file name");
+    }
+
+    let _file = fs::remove_file(&token_vec[1]);
 }

@@ -13,12 +13,12 @@ fn main() -> io::Result<()> {
             .read_line(&mut input)
             .expect("Error while reading line");
 
-        let cleaned_input = input.trim().to_string();
+        input = input.trim().to_string();
 
-        if cleaned_input == "exit" || cleaned_input == "quit" {
+        if input == "exit" {
             break;
         }
-        command_handler(cleaned_input);
+        command_handler(&input);
 
         save_command_in_history(input);
     }
@@ -26,21 +26,27 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn command_handler(input: String) {
-    let token_array: Vec<String> = input
+fn command_handler(input: &str) {
+    let token_vec: Vec<String> = input
         .split_whitespace()
         .map(|token| token.to_string())
         .collect();
 
-    match token_array[0].as_str() {
-        "echo" => command::echo(token_array),
+    let arg: &Option<&str> = &token_vec
+        .iter()
+        .find(|token| token.starts_with('-'))
+        .map(|s| s.as_str());
+
+    match token_vec[0].as_str() {
+        "echo" => command::echo(token_vec),
         "cls" => command::clear(),
-        "cat" => command::cat(token_array),
-        "cd" => command::cd(token_array),
-        "ls" => command::ls(token_array),
-        "touch" => command::touch(token_array),
+        "cat" => command::cat(token_vec),
+        "cd" => command::cd(token_vec),
+        "ls" => command::ls(token_vec.clone(), arg),
+        "touch" => command::touch(token_vec),
+        "rm" => command::rm(token_vec),
         _ => {
-            println!("Error: command not found: {}", token_array[0]);
+            println!("Error: command not found: {}", token_vec[0]);
         }
     }
 }
